@@ -1,16 +1,27 @@
-// Funkcja konwersji zdjęcia na czarno-białe
-function convertToGrayscale(imageElement) {
+// Funkcja skalowania i konwersji zdjęcia na czarno-białe
+function scaleAndConvertToGrayscale(imageElement, maxWidth, maxHeight) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    canvas.width = imageElement.width || imageElement.naturalWidth;
-    canvas.height = imageElement.height || imageElement.naturalHeight;
+    let width = imageElement.width || imageElement.naturalWidth;
+    let height = imageElement.height || imageElement.naturalHeight;
     
-    ctx.drawImage(imageElement, 0, 0);
+    // Skalowanie jeśli potrzeba (zachowując proporcje)
+    if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        width = width * ratio;
+        height = height * ratio;
+    }
     
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    canvas.width = width;
+    canvas.height = height;
+    
+    ctx.drawImage(imageElement, 0, 0, width, height);
+    
+    const imageData = ctx.getImageData(0, 0, width, height);
     const data = imageData.data;
     
+    // Konwersja na czarno-białe
     for (let i = 0; i < data.length; i += 4) {
         const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
         data[i] = gray;     // R
@@ -19,7 +30,24 @@ function convertToGrayscale(imageElement) {
     }
     
     ctx.putImageData(imageData, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.9);
+    return canvas;
+}
+
+// Funkcja konwersji canvas do Blob (do uploadu)
+function canvasToBlob(canvas, quality) {
+    return new Promise((resolve, reject) => {
+        try {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error('Failed to convert canvas to blob'));
+                }
+            }, 'image/jpeg', quality || 0.9);
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
 var selector = document.querySelector(".selector_box");
@@ -77,44 +105,43 @@ imageInput.addEventListener('change', (event) => {
     reader.onload = function(e) {
         var img = new Image();
         img.onload = function() {
-            // Konwertuj na czarno-białe
-            var grayscaleBase64 = convertToGrayscale(img);
+            // Skaluj i konwertuj na czarno-białe (max 1920x1080)
+            var canvas = scaleAndConvertToGrayscale(img, 1920, 1080);
             
-            // Zawsze spróbuj przesłać do Imgur (nie używaj base64 w URL)
-            var formData = new FormData();
-            formData.append("image", dataURLtoBlob(grayscaleBase64));
+            // Konwertuj canvas do Blob
+            canvasToBlob(canvas, 0.9).then(function(blob) {
+                // Utwórz FormData i dodaj blob jako plik
+                var formData = new FormData();
+                formData.append("image", blob, "photo.jpg");
 
-            fetch('https://api.imgur.com/3/image', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Client-ID ec67bcef2e19c08'
-                },
-                body: formData
-            })
-            .then(result => result.json())
-            .then(response => {
-                if (response.success && response.data && response.data.link) {
+                // Prześlij do Imgur
+                fetch('https://api.imgur.com/3/image', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Client-ID ec67bcef2e19c08'
+                    },
+                    body: formData
+                })
+                .then(result => result.json())
+                .then(response => {
                     var url = response.data.link;
                     upload.classList.remove("error_shown")
                     upload.setAttribute("selected", url);
                     upload.classList.add("upload_loaded");
                     upload.classList.remove("upload_loading");
                     upload.querySelector(".upload_uploaded").src = url;
-                } else {
-                    // Jeśli Imgur nie działa, pokaż błąd
+                })
+                .catch(error => {
                     upload.classList.remove("upload_loading");
                     upload.classList.add("error_shown");
                     upload.querySelector(".error").textContent = "Nie udało się przesłać zdjęcia. Spróbuj ponownie.";
-                    alert("Nie udało się przesłać zdjęcia do Imgur. Spróbuj ponownie.");
-                }
-            })
-            .catch(error => {
-                // Jeśli błąd, pokaż komunikat
+                    console.error("Imgur upload error:", error);
+                });
+            }).catch(function(error) {
                 upload.classList.remove("upload_loading");
                 upload.classList.add("error_shown");
-                upload.querySelector(".error").textContent = "Nie udało się przesłać zdjęcia. Spróbuj ponownie.";
-                console.error("Imgur upload error:", error);
-                alert("Nie udało się przesłać zdjęcia do Imgur. Spróbuj ponownie.");
+                upload.querySelector(".error").textContent = "Błąd przetwarzania zdjęcia.";
+                console.error("Canvas to blob error:", error);
             });
         };
         img.src = e.target.result;
@@ -122,18 +149,6 @@ imageInput.addEventListener('change', (event) => {
     reader.readAsDataURL(file);
 })
 
-// Funkcja konwersji dataURL na Blob
-function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(',');
-    var mime = arr[0].match(/:(.*?);/)[1];
-    var bstr = atob(arr[1]);
-    var n = bstr.length;
-    var u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], {type:mime});
-}
 
 document.querySelector(".go").addEventListener('click', () => {
     var empty = [];
