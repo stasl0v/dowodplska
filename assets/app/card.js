@@ -96,7 +96,7 @@ function loadReadyData(result){
     
     document.querySelector(".home_date").innerHTML = localStorage.getItem("homeDate");
 
-    setData("pesel", localStorage.getItem('pesel'));
+    setData("pesel_value", localStorage.getItem('pesel'));
 }
 
 function setImage(image){
