@@ -1,4 +1,28 @@
 
+.login_wrapper{
+    width: var(--width);
+    max-width: 440px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 100vh;
+    padding: 40px 0 60px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+}
+
+body{
+    margin: 0;
+    background-color: var(--background);
+    min-height: 100vh;
+    font-family: "Poppins", "Roboto", sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
 .login_title{
     font-weight: 700;
     font-size: 23px;
@@ -66,14 +90,14 @@
 
 .password_box{
     width: 100%;
-    margin-top: 20px;
+    margin-top: 10px;
     padding-bottom: 10px;
-    height: 165px;
     background-color: var(--secondary);
     margin-left: auto;
     margin-right: auto;
     position: relative;
     border-radius: 15px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.35);
 }
 
 .password_grid{
@@ -104,7 +128,7 @@
 }
 
 .eye{
-    background-image: url('/assets/app/images/eye.png');
+    background-image: url('assets/app/images/eye.png');
     position: absolute;
     top: 0;
     bottom: 0;
@@ -119,7 +143,7 @@
 }
 
 .eye_close{
-    background-image: url('/assets/app/images/eye_closed.png');
+    background-image: url('assets/app/images/eye_closed.png');
 }
 
 .password_input{
@@ -152,29 +176,23 @@
 .bottom{
     display: grid;
     grid-template-columns: 100%;
-    width: var(--width);
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
+    width: 100%;
     grid-template-rows: max-content max-content;
-    position: absolute;
-    bottom: 20px;
-    margin-bottom: 10px;
+    position: relative;
     margin-top: auto;
+    gap: 15px;
 }
 
 .login{
     color: black;
-    line-height: 60px;
+    line-height: 55px;
     text-align: center;
     font-weight: 600;
-    font-size: 24px;
+    font-size: 20px;
     width: 100%;
     background-color: var(--text);
-    height: 60px;
-    border-radius: 40px;
-    margin-bottom: 25px;
+    height: 55px;
+    border-radius: 32px;
 }
 
 .data{
@@ -185,6 +203,7 @@
     display: grid;
     grid-template-columns: 80px 100px calc(100% - 180px);
     grid-template-rows: max-content;
+    align-items: center;
 }
 
 .logo_text{
@@ -199,11 +218,10 @@
 
 .welcome{
     font-weight: 600;
-    font-size: 38px;
-    margin-top: auto;
-    margin-bottom: auto;
+    font-size: 32px;
+    margin-top: 10px;
+    margin-bottom: 0;
     height: max-content;
-    margin-top: 25px;
     color: white;
 }
 
@@ -215,21 +233,22 @@
     height: 100%;
     z-index: -1;
     background-image: url('assets/app/images/login.png');
-    background-size: 105%;
+    background-size: cover;
     background-position: center;
+    filter: blur(5px);
+    opacity: 0.6;
 }
 
 .login_text{
     color: white;
-    margin-top: auto;
-    margin-bottom: auto;
-    height: max-content;
+    margin-top: 8px;
+    margin-bottom: 0;
     opacity: 0.8;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .top_grid{
-    margin-top: 60px;
+    margin-top: 10px;
     display: grid;
     grid-template-columns: max-content max-content;
     grid-template-rows: 100%;
@@ -237,15 +256,12 @@
     width: 97%;
     margin-left: auto;
     margin-right: auto;
+    align-items: center;
 }
 
 .top_text{
     display: grid;
-    grid-template-columns: 100%;
-    width: 97%;
-    height: max-content;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
     grid-template-rows: max-content max-content;
     margin-bottom: 5px;
 }
@@ -255,7 +271,7 @@
 }
 
 .logo_other{
-    height: 38px;
+    height: 30px;
     margin-left: 0px;
     margin-top: auto;
     margin-bottom: auto;
@@ -271,4 +287,28 @@
     margin-bottom: auto;
     width: max-content;
     margin-left: auto;
+}
+
+@media (max-width: 420px) {
+    .login_wrapper{
+        padding: 30px 0 40px;
+    }
+    .welcome{
+        font-size: 28px;
+    }
+    .login_text{
+        font-size: 16px;
+    }
+    .password_input{
+        height: 55px;
+        font-size: 14px;
+    }
+    .login{
+        font-size: 18px;
+        height: 50px;
+        line-height: 50px;
+    }
+    .data{
+        grid-template-columns: 60px 80px calc(100% - 140px);
+    }
 }
