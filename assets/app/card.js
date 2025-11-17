@@ -49,6 +49,18 @@ unfold.addEventListener('click', () => {
 
 })
 
+function htmlEncode(value){
+    if (value === undefined || value === null){
+        return '';
+    }
+    return value.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function loadReadyData(result){
     Object.keys(result).forEach((key) => {
       result[key] = htmlEncode(result[key])
