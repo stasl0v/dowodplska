@@ -182,13 +182,13 @@ body .bottom_bar{
 
 .id_image_data{
     position: relative; 
-    height: 2000px;
+   
 }
 
 .id_image{
     z-index: -1;
     width: 100%;
-    height: 430px;
+    height: 1030px;
     margin-left: auto;
     margin-right: auto;
     display: block;
@@ -530,4 +530,5 @@ body .bottom_bar{
 .page_3_open .page_3{
     bottom: 0;
 }
+
 
